@@ -3,7 +3,7 @@ import Couchbase from 'couchbase';
 import url from 'url';
 import results from './data/2017.json';
 
-const app = Express()
+const app = Express();
  
 app.get('/players', (req, res) => {
   const myCluster = new Couchbase.Cluster('couchbase://localhost');
@@ -56,5 +56,5 @@ app.get('/upload', (req, res) => {
 });
  
 app.listen(1980, () => {
-  console.log('running tennis app...')
-})
+  console.log('running tennis appi...')
+});
