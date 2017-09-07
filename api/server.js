@@ -31,6 +31,20 @@ app.get('/results/:player', (req, res) => {
   });
 });
 
+app.get('/head-to-head/:player1/:player2', (req, res) => {
+  const myCluster = new Couchbase.Cluster('couchbase://localhost');
+  const myBucket = myCluster.openBucket('tennis');
+
+  const query = Couchbase.N1qlQuery.fromString('SELECT * FROM tennis where (Winner = $1 and Loser = $2) or (Winner = $2 and Loser = $1)');
+
+  const results = myBucket.query(query, [req.params.player1, req.params.player2], (err, results) => {
+    if(err) return console.log(err);
+
+    res.send(results)
+  });
+
+});
+
 app.get('/upload', (req, res) => {
   const myCluster = new Couchbase.Cluster('couchbase://localhost');
   const myBucket = myCluster.openBucket('tennis');

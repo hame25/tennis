@@ -7,19 +7,32 @@ import ReactDOMServer from'react-dom/server';
 import createMemoryHistory from 'history/createMemoryHistory';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
+import thunkMiddleware from 'redux-thunk';
+import bodyParser from 'body-parser';
 import createRoutes from './routes';
 import App from './components/app';
+import playersReducer from './reducers/players';
+
 
 const app = Express();
 
-app.use(Express.static(joinPath(__dirname, 'public')))
+app.use(Express.static(joinPath(__dirname, 'public')));
+app.use(bodyParser.urlencoded({ extended: false }));
 
 let layoutPath = joinPath(__dirname, './layout/layout.pug');
 let layout = compileFile(layoutPath);
 
-// app.use('/', (req, res) => {
-//   res.send('Hello world');
-// });
+app.get('/favicon.ico', function(req, res) {
+    res.status(204);
+}); 
+
+app.post('/head-2-head', (req, res) => {
+  console.log('req bdy', req.body);
+  const player1 = req.body.player1;
+  const player2 = req.body.player2;
+
+  res.redirect(`/head-2-head/${player1}/${player2}`);
+});
 
 app.all("*", (req, res) => {
 
@@ -27,17 +40,23 @@ app.all("*", (req, res) => {
   const routes = createRoutes(history);
 
   match({ routes, location: req.originalUrl }, (err, redirectLocation, renderProps) => {
-
-    const components = renderProps.components;
-    const Component = components[components.length - 1].WrappedComponent;
-
-    const store = createStore(() => {});
+    //const components = renderProps.components[1];
+    //const Component = components[components.length - 1].WrappedComponent;
+    //const Component = components[components.length].WrappedComponent;
+    const Component = renderProps.components[1]
+    const store = createStore(
+      playersReducer,
+      applyMiddleware(thunkMiddleware)
+    )
 
     //Promise.all([Component.fetchData({store}), fetchGlobalData({store})]).then(([pageData, globalData]) => {
+    Promise.all([Component.fetchData({store})]).then(([pageData]) => {
+
+      console.log('pageData', pageData)
 
       function createElement(Component, props) {
         //return <Component {...props} {...pageData} {...globalData} />
-        return <Component {...props} />
+        return <Component {...props} {...pageData} />
       }
 
       const html = ReactDOMServer.renderToString(
@@ -51,10 +70,11 @@ app.all("*", (req, res) => {
       const templateLocals = {
         content: html,
         //data: Object.assign({}, pageData, globalData)
+        data: pageData
       }
 
       res.send(layout(templateLocals));
-    //});
+    });
   });
 });
 
