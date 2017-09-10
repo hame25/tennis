@@ -27,7 +27,6 @@ app.get('/favicon.ico', function(req, res) {
 }); 
 
 app.post('/head-2-head', (req, res) => {
-  console.log('req bdy', req.body);
   const player1 = req.body.player1;
   const player2 = req.body.player2;
 
@@ -43,6 +42,7 @@ app.all("*", (req, res) => {
     //const components = renderProps.components[1];
     //const Component = components[components.length - 1].WrappedComponent;
     //const Component = components[components.length].WrappedComponent;
+
     const Component = renderProps.components[1]
     const store = createStore(
       playersReducer,
@@ -50,9 +50,9 @@ app.all("*", (req, res) => {
     )
 
     //Promise.all([Component.fetchData({store}), fetchGlobalData({store})]).then(([pageData, globalData]) => {
-    Promise.all([Component.fetchData({store})]).then(([pageData]) => {
+    Promise.all([Component.fetchData({store, params: renderProps.params})]).then(([pageData]) => {
 
-      console.log('pageData', pageData)
+      //console.log('pageData', pageData)
 
       function createElement(Component, props) {
         //return <Component {...props} {...pageData} {...globalData} />
@@ -74,7 +74,8 @@ app.all("*", (req, res) => {
       }
 
       res.send(layout(templateLocals));
-    });
+    })
+    .catch(err => console.log(err));
   });
 });
 

@@ -9,7 +9,7 @@ const mapStateToProps = state => ({
 
 class HeadToHeadSelector extends React.Component {
 
-  render () {  
+  render () { 
     return (
       <div>
         <form action='/head-2-head' method='POST'>
