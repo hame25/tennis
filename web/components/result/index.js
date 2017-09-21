@@ -1,9 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getResult } from '../../reducers/players';
+import { getResult, /*getResultScore*/ } from '../../reducers/players';
 
 const mapStateToProps = (state, ownProps) => ({
-  result: getResult(state, ownProps.id)
+  result: getResult(state, ownProps.id),
+  //score: getResultScore(state, ownProps.id)
 });
 
 class Result extends React.Component {
