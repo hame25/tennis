@@ -17,10 +17,13 @@ export const getPlayers = () => {
 export const updateHead2HeadResults = (player1, player2) => {
 
   return (dispatch, getState) => {
-    return fetch(`http://localhost:1980/head-to-head/${player1}/${player2}`)
+
+    const p1 = player1 ? player1 : getState().player1;
+    const p2 = player2 ? player2 : getState().player2;
+
+    return fetch(`http://localhost:1980/head-to-head/${p1}/${p2}`, { mode: 'no-cors' })
       .then(res => res.json())
       .then(data => {
-
         const { resultsList, resultsData } = transformResults(data);
 
         dispatch({
@@ -36,6 +39,12 @@ export const updateHead2HeadResults = (player1, player2) => {
       }); 
   }
 }
+
+export const updateSelectedPlayers = (player1, player2) => ({
+    type: 'UPDATE_SELECTED_PLAYERS',
+    player1,
+    player2
+});
 
 function transformResults (data) {
 

@@ -12,7 +12,6 @@ const initialState = JSON.parse(document.documentElement.dataset.props);
 const routes = createRoutes(browserHistory);
 const store = createStore(playersReducer, initialState, applyMiddleware(thunkMiddleware));
 
-
 render (
   <Provider store={store}>
     <App>

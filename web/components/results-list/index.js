@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Result from '../result';
 
 class ResultsList extends React.Component {
@@ -20,6 +21,14 @@ class ResultsList extends React.Component {
       </div>
     );
   }
+}
+
+ResultsList.propTypes = {
+  results: PropTypes.array
+}
+
+ResultsList.defaultProps = {
+  results: []
 }
 
 export default ResultsList;

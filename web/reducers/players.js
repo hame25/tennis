@@ -11,6 +11,11 @@ const players = (state = { players: [] }, action) => {
         head2HeadResults: action.results,
         head2HeadResultsIds: action.resultsIds
       })
+    case 'UPDATE_SELECTED_PLAYERS':
+      return Object.assign({}, state, {
+        player1: action.player1,
+        player2: action.player2
+      })
     default:
       return state
   }

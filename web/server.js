@@ -52,8 +52,6 @@ app.all("*", (req, res) => {
     //Promise.all([Component.fetchData({store}), fetchGlobalData({store})]).then(([pageData, globalData]) => {
     Promise.all([Component.fetchData({store, params: renderProps.params})]).then(([pageData]) => {
 
-      //console.log('pageData', pageData)
-
       function createElement(Component, props) {
         //return <Component {...props} {...pageData} {...globalData} />
         return <Component {...props} {...pageData} />
@@ -70,7 +68,7 @@ app.all("*", (req, res) => {
       const templateLocals = {
         content: html,
         //data: Object.assign({}, pageData, globalData)
-        data: pageData
+        data: Object.assign({}, store.getState())
       }
 
       res.send(layout(templateLocals));
@@ -81,5 +79,5 @@ app.all("*", (req, res) => {
 
 
 app.listen(1979, () => {
-  console.log('running tennis app...')
+  console.log('running tennis app on 1979...')
 });

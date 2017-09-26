@@ -11,11 +11,19 @@ const mapStateToProps = state => ({
 
 class Head2Head extends React.Component {
 
+  constructor() {
+    super();
+  }
+
   static fetchData ({store, params}) {
 
     const { player1, player2 } = params;
 
     return store.dispatch(updateHead2HeadResults(player1, player2));
+  }
+
+  componentDidMount() {
+    this.props.updateHead2HeadResults(this.props.players.player1, this.props.players.player2)
   }
   
   render () { 
@@ -28,4 +36,4 @@ class Head2Head extends React.Component {
   }
 }
 
-export default connect(mapStateToProps)(Head2Head);
+export default connect(mapStateToProps, { updateHead2HeadResults })(Head2Head);
