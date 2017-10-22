@@ -19,10 +19,9 @@ class HeadToHeadSelector extends React.Component {
   }
 
   componentDidMount() {
-    // if(!this.props.players) {
-      console.log('getting players')
+    if(!this.props.players) {
       this.props.getAllPlayers();
-    // }
+    }
   }
 
   onChange(id) {

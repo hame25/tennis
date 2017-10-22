@@ -21,3 +21,13 @@ render (
   document.getElementById('content')
 );
 
+if('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./service-worker.js')
+  .then(() => {
+    console.log('Service worker registered');
+  })
+  .catch(error => {
+    console.log('Service worker registration failed', error)
+  });
+}
+

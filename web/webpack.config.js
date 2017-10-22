@@ -1,3 +1,5 @@
+var CopyWebpackPlugin = require('copy-webpack-plugin');
+
 module.exports = {
   entry: [
     './client.js'
@@ -15,5 +17,10 @@ module.exports = {
         include: __dirname
       }
     ]
-  }
+  },
+  plugins: [
+    new CopyWebpackPlugin([
+    { from: './service-worker', to: './'}
+    ])
+  ]
 };
