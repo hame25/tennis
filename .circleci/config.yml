@@ -38,9 +38,9 @@ jobs:
 
       - deployment:
         staging:
-        branch: master
-        heroku:
-          appname: alex-tennis
+          branch: master
+          heroku:
+            appname: alex-tennis
 
 
 
