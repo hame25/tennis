@@ -1,9 +1,31 @@
 import Express from 'express';
-import Couchbase from 'couchbase';
 import url from 'url';
-import results from './data/2017.json';
+import MongoDB from 'mongodb';
+import Bluebird from 'bluebird';
+import connectionConfig from '../config/db-connection.json';
+
+const MongoClient = Bluebird.promisifyAll(MongoDB.MongoClient);
 
 const app = Express();
+
+const dbUrl = `mongodb://${connectionConfig.username}:${connectionConfig.password}@ds229909.mlab.com:29909/alex-tennis-db`;
+
+const connectToResults = async () => await MongoClient.connectAsync(dbUrl);
+
+app.use('/findall', async (req, res) => {
+
+  try {
+    const dbConnection = await connectToResults();
+    const db = dbConnection.db(connectionConfig.databaseName);
+
+    const results = await db.collection('results').find().toArray();
+
+    res.send(results);
+  } catch (e) {
+    res.status(500);
+    res.send({ error: e.message });
+  }
+});
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -49,30 +71,6 @@ app.get('/head-to-head/:player1/:player2', (req, res) => {
     res.send(results)
   });
 
-});
-
-app.get('/upload', (req, res) => {
-  const myCluster = new Couchbase.Cluster('couchbase://localhost');
-  const myBucket = myCluster.openBucket('tennis');
-
-  let i = 1;
-
-  const queryTemplate = Couchbase.N1qlQuery.fromString('INSERT INTO tennis (KEY, VALUE) VALUES ($1, $2)');
-
-  results.map((item) => {
-
-    item.type = "result";
-    item.id = i.toString();
-    myBucket.query(queryTemplate, [i.toString(), item], 
-    (err, rows) => {
-      if (err) console.log(err)
-      console.log("Got rows: %j", rows);  
-      
-      console.log("Returning...");
-    });
-    i++;
-  });
-  res.send('Processing...');
 });
  
 app.listen(1980, () => {
