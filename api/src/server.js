@@ -1,5 +1,4 @@
 import Express from 'express';
-import url from 'url';
 import MongoDB from 'mongodb';
 import Bluebird from 'bluebird';
 import connectionConfig from '../config/db-connection.json';
@@ -69,17 +68,27 @@ app.get('/results/:player', async (req, res) => {
   }
 });
 
-app.get('/head-to-head/:player1/:player2', (req, res) => {
-  const myCluster = new Couchbase.Cluster('couchbase://localhost');
-  const myBucket = myCluster.openBucket('tennis');
+app.get('/head-to-head/:player1/:player2', async (req, res) => {
+  const { player1, player2 } = req.params;
 
-  const query = Couchbase.N1qlQuery.fromString('SELECT * FROM tennis where (Winner = $1 and Loser = $2) or (Winner = $2 and Loser = $1)');
+  if(!player1 || !player2) {
+    res.status(500);
+    res.send({ error: 'Player1 or player2 not set' });
+  }
 
-  const results = myBucket.query(query, [req.params.player1, req.params.player2], (err, results) => {
-    if(err) return console.log(err);
+  try {
+    const dbConnection = await connectToResults();
+    const db = dbConnection.db(connectionConfig.databaseName);
 
-    res.send(results)
-  });
+    const results = await db.collection('results').find(
+      { $or: [{ Winner: player1, Loser: player2 }, { Winner: player2, Loser: player1 }] }
+    ).toArray();
+
+    res.send(results);
+  } catch (e) {
+    res.status(500);
+    res.send({ error: e.message});
+  }
 
 });
  
