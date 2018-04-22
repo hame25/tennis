@@ -2,3 +2,5 @@ node_modules
 public
 api/config
 api/dist
+
+.idea
