@@ -33,30 +33,40 @@ app.use(function(req, res, next) {
   next();
 });
  
-app.get('/players', (req, res) => {
-  const myCluster = new Couchbase.Cluster('couchbase://localhost');
-  const myBucket = myCluster.openBucket('tennis');
+app.get('/players', async (req, res) => {
 
-  const query = Couchbase.N1qlQuery.fromString('SELECT DISTINCT Winner as name FROM tennis Order By Winner');
+  try {
+    const dbConnection = await connectToResults();
+    const db = dbConnection.db(connectionConfig.databaseName);
 
-  const results = myBucket.query(query, (err, results) => {
-    if(err) return console.log(err);
+    const players = await db.collection('results').distinct('Winner');
 
-    res.send(results)
-  });
+    res.send(players);
+  } catch (e) {
+    res.status(500);
+    res.send({ error: e.message});
+  }
 });
 
-app.get('/results/:player', (req, res) => {
-  const myCluster = new Couchbase.Cluster('couchbase://localhost');
-  const myBucket = myCluster.openBucket('tennis');
+app.get('/results/:player', async (req, res) => {
+  const name = req.params.player;
 
-  const query = Couchbase.N1qlQuery.fromString('SELECT * FROM tennis where Winner = $1 or Loser = $1');
+  if(!name) {
+    res.status(500);
+    res.send({ error: 'No player name set' });
+  }
 
-  const results = myBucket.query(query, [req.params.player], (err, results) => {
-    if(err) return console.log(err);
+  try {
+    const dbConnection = await connectToResults();
+    const db = dbConnection.db(connectionConfig.databaseName);
 
-    res.send(results)
-  });
+    const players = await db.collection('results').find({ $or: [{ Winner: name }, { Loser: name }] }).toArray();
+
+    res.send(players);
+  } catch (e) {
+    res.status(500);
+    res.send({ error: e.message});
+  }
 });
 
 app.get('/head-to-head/:player1/:player2', (req, res) => {
